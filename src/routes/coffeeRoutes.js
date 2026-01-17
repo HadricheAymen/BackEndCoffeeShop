@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getAllCoffees, getCoffeeById, calculatePrice } = require('../controllers/coffeeController');
+const { getAllCoffees, getCoffeesByCategory, getCoffeeById, calculatePrice } = require('../controllers/coffeeController');
 const { calculatePriceValidator } = require('../validators/coffeeValidator');
 const validate = require('../middleware/validate');
 
@@ -8,33 +8,125 @@ const validate = require('../middleware/validate');
  * @swagger
  * /api/coffees:
  *   get:
- *     summary: Get all coffees with optional filtering
+ *     summary: Get all coffees with optional filtering (no pagination)
  *     tags: [Coffees]
  *     parameters:
- *       - in: query
- *         name: category_id
- *         schema:
- *           type: integer
  *       - in: query
  *         name: is_available
  *         schema:
  *           type: boolean
  *           default: true
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           default: 50
- *       - in: query
- *         name: offset
- *         schema:
- *           type: integer
- *           default: 0
+ *         description: Filter by availability status
  *     responses:
  *       200:
- *         description: List of coffees
+ *         description: List of all coffees
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                       name:
+ *                         type: string
+ *                       description:
+ *                         type: string
+ *                       price:
+ *                         type: number
+ *                       category_id:
+ *                         type: integer
+ *                       category_name:
+ *                         type: string
+ *                       is_available:
+ *                         type: boolean
+ *                       average_rating:
+ *                         type: number
+ *       500:
+ *         description: Server error
  */
 router.get('/', getAllCoffees);
+
+/**
+ * @swagger
+ * /api/coffees/category/{categoryId}:
+ *   get:
+ *     summary: Get all coffees by category ID (no pagination)
+ *     tags: [Coffees]
+ *     parameters:
+ *       - in: path
+ *         name: categoryId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Category ID
+ *         example: 1
+ *       - in: query
+ *         name: is_available
+ *         schema:
+ *           type: boolean
+ *           default: true
+ *         description: Filter by availability status
+ *     responses:
+ *       200:
+ *         description: List of coffees in the specified category
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     category:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: integer
+ *                           example: 1
+ *                         name:
+ *                           type: string
+ *                           example: Espresso
+ *                         description:
+ *                           type: string
+ *                           example: Strong and bold coffee drinks
+ *                     coffees:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: integer
+ *                           name:
+ *                             type: string
+ *                           description:
+ *                             type: string
+ *                           price:
+ *                             type: number
+ *                           category_id:
+ *                             type: integer
+ *                           category_name:
+ *                             type: string
+ *                           is_available:
+ *                             type: boolean
+ *                           average_rating:
+ *                             type: number
+ *       404:
+ *         description: Category not found
+ *       500:
+ *         description: Server error
+ */
+router.get('/category/:categoryId', getCoffeesByCategory);
 
 /**
  * @swagger

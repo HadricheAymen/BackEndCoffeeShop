@@ -7,7 +7,6 @@ const {
   updateReview,
   deleteReview
 } = require('../controllers/reviewController');
-const authenticate = require('../middleware/auth');
 const { createReviewValidator, updateReviewValidator } = require('../validators/reviewValidator');
 const validate = require('../middleware/validate');
 
@@ -46,7 +45,7 @@ const validate = require('../middleware/validate');
  *       409:
  *         description: User has already reviewed this coffee
  */
-router.post('/', authenticate, createReviewValidator, validate, createReview);
+router.post('/', createReviewValidator, validate, createReview);
 
 /**
  * @swagger
@@ -101,7 +100,7 @@ router.get('/coffee/:coffeeId', getReviewsByCoffee);
  *       200:
  *         description: List of user's reviews
  */
-router.get('/user', authenticate, getUserReviews);
+router.get('/user', getUserReviews);
 
 /**
  * @swagger
@@ -137,7 +136,7 @@ router.get('/user', authenticate, getUserReviews);
  *       404:
  *         description: Review not found or unauthorized
  */
-router.put('/:id', authenticate, updateReviewValidator, validate, updateReview);
+router.patch('/:id', updateReviewValidator, validate, updateReview);
 
 /**
  * @swagger
@@ -159,7 +158,7 @@ router.put('/:id', authenticate, updateReviewValidator, validate, updateReview);
  *       404:
  *         description: Review not found or unauthorized
  */
-router.delete('/:id', authenticate, deleteReview);
+router.delete('/:id', deleteReview);
 
 module.exports = router;
 

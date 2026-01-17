@@ -105,9 +105,9 @@ class Coffee {
   }
 
   /**
-   * Get all coffees with optional filtering and pagination
+   * Get all coffees with optional filtering (no pagination)
    */
-  static async findAll({ category_id, is_available, limit = 50, offset = 0 }) {
+  static async findAll({ is_available } = {}) {
     let query = `
       SELECT cp.*, c.name as category_name
       FROM coffee_products cp
@@ -116,18 +116,36 @@ class Coffee {
     `;
     const params = [];
 
-    if (category_id) {
-      query += ' AND cp.category_id = ?';
-      params.push(category_id);
+    if (is_available !== undefined) {
+      query += ' AND cp.is_available = ?';
+      params.push(is_available);
     }
+
+    query += ' ORDER BY cp.name';
+
+    const [rows] = await pool.execute(query, params);
+    // Return plain objects for backward compatibility
+    return rows;
+  }
+
+  /**
+   * Get all coffees by category ID with optional filtering (no pagination)
+   */
+  static async findByCategory(categoryId, { is_available } = {}) {
+    let query = `
+      SELECT cp.*, c.name as category_name, c.description as category_description
+      FROM coffee_products cp
+      LEFT JOIN categories c ON cp.category_id = c.id
+      WHERE cp.category_id = ?
+    `;
+    const params = [categoryId];
 
     if (is_available !== undefined) {
       query += ' AND cp.is_available = ?';
       params.push(is_available);
     }
 
-    query += ' ORDER BY cp.name LIMIT ? OFFSET ?';
-    params.push(limit, offset);
+    query += ' ORDER BY cp.name';
 
     const [rows] = await pool.execute(query, params);
     // Return plain objects for backward compatibility

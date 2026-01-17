@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const { addFavorite, getFavorites, removeFavorite } = require('../controllers/favoriteController');
-const authenticate = require('../middleware/auth');
 const { addFavoriteValidator } = require('../validators/favoriteValidator');
 const validate = require('../middleware/validate');
 
@@ -36,7 +35,7 @@ const validate = require('../middleware/validate');
  *       409:
  *         description: Coffee already in favorites
  */
-router.post('/', authenticate, addFavoriteValidator, validate, addFavorite);
+router.post('/', addFavoriteValidator, validate, addFavorite);
 
 /**
  * @swagger
@@ -50,7 +49,7 @@ router.post('/', authenticate, addFavoriteValidator, validate, addFavorite);
  *       200:
  *         description: List of favorite coffees
  */
-router.get('/', authenticate, getFavorites);
+router.get('/', getFavorites);
 
 /**
  * @swagger
@@ -72,7 +71,7 @@ router.get('/', authenticate, getFavorites);
  *       404:
  *         description: Favorite not found
  */
-router.delete('/:id', authenticate, removeFavorite);
+router.delete('/:id', removeFavorite);
 
 module.exports = router;
 

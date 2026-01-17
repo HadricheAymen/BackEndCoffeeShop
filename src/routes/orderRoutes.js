@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const { createOrder, getOrderHistory, getOrderById, updateOrderStatus, calculateOrderPrice } = require('../controllers/orderController');
-const authenticate = require('../middleware/auth');
 const { createOrderValidator } = require('../validators/orderValidator');
 const validate = require('../middleware/validate');
 
@@ -44,7 +43,7 @@ const validate = require('../middleware/validate');
  *       401:
  *         description: Unauthorized
  */
-router.post('/', authenticate, createOrderValidator, validate, createOrder);
+router.post('/', createOrderValidator, validate, createOrder);
 
 /**
  * @swagger
@@ -178,7 +177,7 @@ router.post('/calculate-price', createOrderValidator, validate, calculateOrderPr
  *       401:
  *         description: Unauthorized
  */
-router.get('/', authenticate, getOrderHistory);
+router.get('/', getOrderHistory);
 
 /**
  * @swagger
@@ -202,7 +201,7 @@ router.get('/', authenticate, getOrderHistory);
  *       401:
  *         description: Unauthorized
  */
-router.get('/:id', authenticate, getOrderById);
+router.get('/:id', getOrderById);
 
 /**
  * @swagger
@@ -234,7 +233,7 @@ router.get('/:id', authenticate, getOrderById);
  *       404:
  *         description: Order not found
  */
-router.patch('/:id/status', authenticate, updateOrderStatus);
+router.patch('/:id/status', updateOrderStatus);
 
 module.exports = router;
 

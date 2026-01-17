@@ -1,32 +1,59 @@
 const Coffee = require('../models/Coffee');
+const Category = require('../models/Category');
 const Order = require('../models/Order');
 
 /**
- * Get all coffees with optional filtering
+ * Get all coffees with optional filtering (no pagination)
  */
 const getAllCoffees = async (req, res, next) => {
   try {
-    const category_id = req.query.category_id ? parseInt(req.query.category_id) : null;
     const is_available = req.query.is_available !== undefined ? req.query.is_available === 'true' : true;
-    const limit = parseInt(req.query.limit) || 50;
-    const offset = parseInt(req.query.offset) || 0;
 
     const coffees = await Coffee.findAll({
-      category_id,
-      is_available,
-      limit,
-      offset
+      is_available
+    });
+
+    res.json({
+      success: true,
+      data: coffees
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Get all coffees by category ID with optional filtering (no pagination)
+ */
+const getCoffeesByCategory = async (req, res, next) => {
+  try {
+    const { categoryId } = req.params;
+    const is_available = req.query.is_available !== undefined ? req.query.is_available === 'true' : true;
+
+    // Verify category exists
+    const category = await Category.findById(categoryId);
+
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: 'Category not found'
+      });
+    }
+
+    // Get coffees for this category
+    const coffees = await Coffee.findByCategory(categoryId, {
+      is_available
     });
 
     res.json({
       success: true,
       data: {
-        coffees,
-        pagination: {
-          limit,
-          offset,
-          count: coffees.length
-        }
+        category: {
+          id: category.id,
+          name: category.name,
+          description: category.description
+        },
+        coffees: coffees
       }
     });
   } catch (error) {
@@ -106,6 +133,7 @@ const calculatePrice = async (req, res, next) => {
 
 module.exports = {
   getAllCoffees,
+  getCoffeesByCategory,
   getCoffeeById,
   calculatePrice
 };
